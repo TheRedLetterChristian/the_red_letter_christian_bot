@@ -41,5 +41,28 @@ ref_clip = ref_clip.set_position(('center','bottom')).set_duration(20).margin(bo
 video = CompositeVideoClip([background, verse_clip, ref_clip])
 video = video.set_audio(AudioFileClip("voice.mp3"))
 video.write_videofile("short.mp4", fps=24)
+# === AUTO UPLOAD SECTION (uncomment when ready) ===
+
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
+import tiktoken  # pip install tiktoken python-telegram-bot etc. if needed
+
+# YouTube upload
+youtube = build('youtube', 'v3', developerKey=os.getenv("YOUTUBE_API_KEY"))  # or use OAuth
+request_body = {
+    'snippet': {
+        'title': f"{reference} – Red Letter Words of Jesus",
+        'description': f'"{verse}"\n\nDaily red-letter devotionals from The Red Letter Christian 📖🔴\n#RedLetterChristian #JesusWords',
+        'tags': ['Jesus', 'Bible', 'Red Letter', 'Christian', 'Devotional'],
+        'categoryId': '22'  # People & Blogs
+    },
+    'status': {'privacyStatus': 'public'}
+}
+media = MediaFileUpload("short.mp4", resumable=True)
+response = youtube.videos().insert(part='snippet,status', body=request_body, media_body=media).execute()
+print("Uploaded to YouTube:", response['id'])
+
+# TikTok & Instagram via manual or third-party (or use Buffer/Publer API here)
+print("Short ready — upload short.mp4 manually to TikTok/Instagram or connect Buffer")
 
 print("Daily Red Letter Short created! short.mp4 is ready.")
