@@ -1,0 +1,4 @@
+moviepy
+elevenlabs
+gspread
+oauth2client
